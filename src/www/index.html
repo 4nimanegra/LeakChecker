@@ -1,0 +1,354 @@
+<html>
+
+	<script>
+
+		var timetocheck;
+		var timetowait;
+		var rotation=0;
+
+		timetocheck = 0;
+		timetowait = 60;
+
+		function getTime(){
+
+			timetocheck=Math.floor((new Date().getTime())/1000)+timetowait;
+
+		}
+
+		function checkTime(){
+
+			return timetocheck < Math.floor((new Date().getTime())/1000);
+
+		}
+
+		function waitTime(){
+
+			return timetocheck - Math.floor((new Date().getTime())/1000);
+
+		}
+
+	</script>
+
+	<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
+
+	<script src="cordova.js"></script>
+
+	<head>
+		<style>
+
+			.fondo {
+				position: fixed;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				overflow: hidden;
+				z-index: -100;
+				width: 100%;
+				height: 100%;
+			}
+
+			.fondovideo {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+			}
+
+			.body {
+
+				color: #eee;
+				font-family: "Courier New",sans-serif,monospace;
+
+			}
+
+			.button {
+
+				font-size: 24px;
+				outline: none;
+				box-shadow: 0 0 10px rgba(0, 0, 255, 1);
+				border-radius: 12px;
+				padding:0.5%;
+				border: 1px solid rgb(0,0,255);
+				background: rgba(0,0,0,0.5);
+				color: rgb(255,255,255);
+			}
+
+
+			.input {
+
+				font-size: 24px;
+				outline: none;
+				box-shadow: 0 0 10px rgba(0, 0, 255, 1);
+				padding:0.5%;
+				border: 1px solid rgb(0,0,255);
+				background: rgba(0,0,0,0.5);
+				color: rgb(255,255,255);
+
+			}
+
+			.titulo {
+
+				font-size: 26px;
+				width: 80%;
+				background: rgba(0,0,0,0.5);
+				border: 1px solid rgb(0,0,255);
+				box-shadow: 0 0 10px rgba(0, 0, 255, 1);
+			}
+
+			.leak {
+
+				font-size: 24px;
+				overflow-y: scroll;
+				width: 80%;
+				height: 40%;
+				background: rgba(0,0,0,0.5);
+				border: 1px solid rgb(0,0,255);
+				box-shadow: 0 0 10px rgba(0, 0, 255, 1);
+				color: #eee;
+
+			}
+
+
+		</style>
+
+		<title>Leak Checker</title>
+	</head>
+
+	<body class="body"> 
+
+		<div class="fondo">
+			<img class="fondovideo" src="images/back1.gif"></img>
+		</div>
+
+
+		<div align="center">
+
+
+		<div class="titulo">
+			<h1>Leak Checker</h1>
+		</div>
+
+		<br><br>
+		<input class="input" placeholder="Insert an Email" id="email"></input><br><br>
+		<button class="button" id="checkme" height="10" style="input" onCLick="newrequest(document.getElementById('email').value,5);">Search</button>
+		<br><br>
+		<div class="leak" id="leak" align="left">
+
+		</div>
+
+		<div id="waiting" align="center" style="display:none;">
+
+			<br><br><br>
+
+			<img id="image" width="40%" src="images/clock.svg" style="transform:rotate(0deg);"></img>
+
+		</div>
+
+	</body>
+
+	<script>
+
+		function rotateclock(){
+
+			rotation=rotation+10;
+			document.getElementById("image").style.transform="rotate("+rotation+"deg)";
+
+		}
+
+		setInterval(function(){rotateclock();},50);
+		
+		function newrequest(email,retries){
+
+			var user;
+			var domain;
+
+			var url;
+			var totalurls;
+			var urlindex;
+
+			document.getElementById("checkme").disabled = true;
+			document.getElementById("waiting").style.display = "";
+			document.getElementById("leak").style.display = "none";
+			document.getElementById("leak").innerHTML = "";
+
+			if(!checkTime()){
+
+				document.getElementById("leak").innerHTML = "Sorry, you should wait at least "+waitTime()+" seconds to make a new check. Dont be an Script kiddie.";
+
+				document.getElementById("checkme").disabled = false;
+				document.getElementById("waiting").style.display = "none";
+				document.getElementById("leak").style.display = "";
+
+				return;
+
+			}
+
+			if(retries == 0){
+
+				document.getElementById("leak").innerHTML = "Error on gateway, retry later.";
+
+				document.getElementById("checkme").disabled = false;
+				document.getElementById("waiting").style.display = "none";
+				document.getElementById("leak").style.display = "";
+
+				return;
+
+			}
+
+			if(email === ""){
+
+				document.getElementById("leak").innerHTML = "An Email should be tiped.";
+
+				document.getElementById("checkme").disabled = false;
+				document.getElementById("waiting").style.display = "none";
+				document.getElementById("leak").style.display = "";
+
+				return;
+
+			}
+
+			user=email.split("@");
+
+			if(user.length == 2){
+
+				domain=user[1];
+				user=user[0];
+
+			}else{
+
+				user="";
+				domain="";
+
+			}
+
+			if(user.length == 0){
+
+				document.getElementById("leak").innerHTML = "An username for Email should be tiped.";
+
+				document.getElementById("checkme").disabled = false;
+				document.getElementById("waiting").style.display = "none";
+				document.getElementById("leak").style.display = "";
+
+				return;
+
+			}
+
+			if(domain.length == 0){
+
+				document.getElementById("leak").innerHTML = "An domain for Email should be tiped.";
+
+				document.getElementById("checkme").disabled = false;
+				document.getElementById("waiting").style.display = "none";
+				document.getElementById("leak").style.display = "";
+
+				return;
+
+			}
+
+			options = {
+
+				method: 'post',
+				data: {luser: user, domain: domain, luseropr: 0, domainopr: 0, submitform: "em"}
+
+			};
+
+			url = {};
+
+			url[0] = 'https://pwndb2am4tzkvold.tor2web.xyz';
+			url[1] = 'https://pwndb2am4tzkvold.onion.sh';
+			url[2] = 'https://pwndb2am4tzkvold.tor2web.io';
+			url[3] = 'https://pwndb2am4tzkvold.onion.ws';
+
+			totalurls = 4;
+
+			urlindex = Math.floor(Math.random()*totalurls)%totalurls;
+
+			cordova.plugin.http.setServerTrustMode("nocheck",function(response){},function(response){});
+
+			cordova.plugin.http.sendRequest(url[urlindex], options, function(response){
+			
+
+				var aux;
+				var message;
+
+				var i,ii;
+
+				aux=response.data.split("pwndb");
+
+				if(aux.length == 1){
+
+					setTimeout(newrequest(email,retries-1),3000);
+
+				}
+
+				aux=response.data.split("Array");
+				message="<ul>";
+
+				i=1;
+
+				while(i < aux.length){
+
+					leak=aux[i].split("(")[1].split(")")[0];
+
+					leak=leak.split(" => ");
+
+					message=message+"<li>";
+					
+					ii=0;
+
+					while(ii < leak[4].length){
+
+    						if(ii<2){
+
+							message=message+leak[4][ii];
+
+						}else if(ii>=(leak[4].length-3)){
+
+							message=message+leak[4][ii];
+
+    						}else{
+
+    							message=message+"*";
+
+    						}
+					
+						ii=ii+1;
+
+					}
+
+					message=message+"</li>";
+
+					i=i+1;
+
+				}
+
+				message=message+"</ul>";
+
+				if(i == 1){
+
+					document.getElementById("leak").innerHTML ="No leaks has been detected.";
+
+				}else{
+
+					document.getElementById("leak").innerHTML = message;
+
+				}
+
+				document.getElementById("checkme").disabled = false;
+				document.getElementById("waiting").style.display = "none";
+				document.getElementById("leak").style.display = "";
+
+
+				getTime();
+			
+			}, function(response){setTimeout(newrequest(email,retries-1),3000);});
+
+		}
+
+		document.getElementById("leak").style.display="none";
+
+	</script>
+
+</html>
